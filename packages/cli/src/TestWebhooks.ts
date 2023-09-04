@@ -149,7 +149,7 @@ export class TestWebhooks implements IWebhookManager {
 
 				// Inform editor-ui that webhook got received
 				if (sessionId !== undefined) {
-					push.send('testWebhookReceived', { workflowId, executionId }, sessionId);
+					await push.send('testWebhookReceived', { workflowId, executionId }, sessionId);
 				}
 			} catch {}
 
@@ -206,9 +206,7 @@ export class TestWebhooks implements IWebhookManager {
 		}
 
 		// Remove test-webhooks automatically if they do not get called (after 120 seconds)
-		const timeout = setTimeout(() => {
-			this.cancelTestWebhook(workflowData.id);
-		}, 120000);
+		const timeout = setTimeout(async () => this.cancelTestWebhook(workflowData.id), 120000);
 
 		const { activeWebhooks, testWebhookData } = this;
 
@@ -247,9 +245,8 @@ export class TestWebhooks implements IWebhookManager {
 
 	/**
 	 * Removes a test webhook of the workflow with the given id
-	 *
 	 */
-	cancelTestWebhook(workflowId: string): boolean {
+	async cancelTestWebhook(workflowId: string): Promise<boolean> {
 		let foundWebhook = false;
 		const { activeWebhooks, push, testWebhookData } = this;
 
@@ -265,7 +262,7 @@ export class TestWebhooks implements IWebhookManager {
 			// Inform editor-ui that webhook got received
 			if (sessionId !== undefined) {
 				try {
-					push.send('testWebhookDeleted', { workflowId }, sessionId);
+					await push.send('testWebhookDeleted', { workflowId }, sessionId);
 				} catch {
 					// Could not inform editor, probably is not connected anymore. So simply go on.
 				}

@@ -133,12 +133,12 @@ export class NodesController {
 		if (!hasLoaded) this.communityPackageService.removePackageFromMissingList(name);
 
 		// broadcast to connected frontends that node list has been updated
-		installedPackage.installedNodes.forEach((node) => {
-			this.push.send('reloadNodeType', {
+		for (const node of installedPackage.installedNodes) {
+			await this.push.broadcast('reloadNodeType', {
 				name: node.type,
 				version: node.latestVersion,
 			});
-		});
+		}
 
 		void this.internalHooks.onCommunityPackageInstallFinished({
 			user: req.user,
@@ -226,12 +226,12 @@ export class NodesController {
 		}
 
 		// broadcast to connected frontends that node list has been updated
-		installedPackage.installedNodes.forEach((node) => {
-			this.push.send('removeNodeType', {
+		for (const node of installedPackage.installedNodes) {
+			await this.push.broadcast('removeNodeType', {
 				name: node.type,
 				version: node.latestVersion,
 			});
-		});
+		}
 
 		void this.internalHooks.onCommunityPackageDeleteFinished({
 			user: req.user,
@@ -265,19 +265,19 @@ export class NodesController {
 			);
 
 			// broadcast to connected frontends that node list has been updated
-			previouslyInstalledPackage.installedNodes.forEach((node) => {
-				this.push.send('removeNodeType', {
+			for (const node of previouslyInstalledPackage.installedNodes) {
+				await this.push.broadcast('removeNodeType', {
 					name: node.type,
 					version: node.latestVersion,
 				});
-			});
+			}
 
-			newInstalledPackage.installedNodes.forEach((node) => {
-				this.push.send('reloadNodeType', {
+			for (const node of newInstalledPackage.installedNodes) {
+				await this.push.broadcast('reloadNodeType', {
 					name: node.name,
 					version: node.latestVersion,
 				});
-			});
+			}
 
 			void this.internalHooks.onCommunityPackageUpdateFinished({
 				user: req.user,
@@ -291,12 +291,12 @@ export class NodesController {
 
 			return newInstalledPackage;
 		} catch (error) {
-			previouslyInstalledPackage.installedNodes.forEach((node) => {
-				this.push.send('removeNodeType', {
+			for (const node of previouslyInstalledPackage.installedNodes) {
+				await this.push.broadcast('removeNodeType', {
 					name: node.type,
 					version: node.latestVersion,
 				});
-			});
+			}
 
 			const message = [
 				`Error removing package "${name}"`,

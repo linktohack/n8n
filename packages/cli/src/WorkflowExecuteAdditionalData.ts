@@ -274,7 +274,7 @@ function hookFunctionsPush(): IWorkflowExecuteHooks {
 					workflowId: this.workflowData.id,
 				});
 
-				pushInstance.send('nodeExecuteBefore', { executionId, nodeName }, sessionId);
+				await pushInstance.send('nodeExecuteBefore', { executionId, nodeName }, sessionId);
 			},
 		],
 		nodeExecuteAfter: [
@@ -291,7 +291,7 @@ function hookFunctionsPush(): IWorkflowExecuteHooks {
 					workflowId: this.workflowData.id,
 				});
 
-				pushInstance.send('nodeExecuteAfter', { executionId, nodeName, data }, sessionId);
+				await pushInstance.send('nodeExecuteAfter', { executionId, nodeName, data }, sessionId);
 			},
 		],
 		workflowExecuteBefore: [
@@ -307,7 +307,7 @@ function hookFunctionsPush(): IWorkflowExecuteHooks {
 				if (sessionId === undefined) {
 					return;
 				}
-				pushInstance.send(
+				await pushInstance.send(
 					'executionStarted',
 					{
 						executionId,
@@ -372,7 +372,7 @@ function hookFunctionsPush(): IWorkflowExecuteHooks {
 					retryOf,
 				};
 
-				pushInstance.send('executionFinished', sendData, sessionId);
+				await pushInstance.send('executionFinished', sendData, sessionId);
 			},
 		],
 	};
@@ -1100,7 +1100,7 @@ export function setExecutionStatus(status: ExecutionStatus) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function sendMessageToUI(source: string, messages: any[]) {
+export async function sendMessageToUI(source: string, messages: any[]) {
 	const { sessionId } = this;
 	if (sessionId === undefined) {
 		return;
@@ -1109,7 +1109,7 @@ export function sendMessageToUI(source: string, messages: any[]) {
 	// Push data to session which started workflow
 	try {
 		const pushInstance = Container.get(Push);
-		pushInstance.send(
+		await pushInstance.send(
 			'sendConsoleMessage',
 			{
 				source: `[Node: "${source}"]`,
