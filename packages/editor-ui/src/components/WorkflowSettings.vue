@@ -68,7 +68,7 @@
 					</el-col>
 				</el-row>
 				<div v-if="isSharingEnabled">
-					<el-row>
+					<el-row data-test-id="workflow-caller-policy">
 						<el-col :span="10" class="setting-name">
 							{{ $locale.baseText('workflowSettings.callerPolicy') + ':' }}
 							<n8n-tooltip placement="top">
